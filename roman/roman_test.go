@@ -2,81 +2,59 @@ package roman
 
 import "testing"
 
-// func TestRomanNumerals(t *testing.T) {
-// 	got := ConvertToRoman(1)
-// 	want := "I"
+func TestRomanNumeral(t *testing.T) {
 
-// 	if got != want {
-// 		t.Errorf("got %q, want %q", got, want)
-// 	}
-
-// 	t.Run("2 gets converted to II", func(t *testing.T) {
-// 		got := ConvertToRoman(2)
-// 		want := "II"
-
-// 		if got != want {
-// 			t.Errorf("got %q, want %q", got, want)
-// 		}
-// 	})
-// }
-
-func TestRomanNumerals(t *testing.T) {
-	// Struct literals
-	cases := []struct {
-		Description string
-		Arabic      int
-		Want        string
-	}{
-		{"1 gets converted to I", 1, "I"},
-		{"2 gets converted to I", 2, "II"},
-		{"3 gets converted to I", 3, "III"},
-		{"4 gets converted to IV", 4, "IV"},
-		{"5 gets converted to V", 5, "V"},
-		{"8 gets converted to IX", 8, "VIII"},
-		{"9 gets converted to IX", 9, "IX"},
-		{"10 gets converted to X", 10, "X"},
-		{"14 gets converted to XIV", 14, "XIV"},
-		{"40 gets converted to XL", 40, "XL"},
+	type test struct {
+		description string
+		arabic      int
+		want        string
 	}
 
-	for _, test := range cases {
-		t.Run(test.Description, func(t *testing.T) {
-			got := ConvertToRoman(test.Arabic)
-			want := test.Want
+	tests := []test{
+		{"test 1 return I", 1, "I"},
+		{"test 2 return II", 2, "II"},
+		{"test 3 return III", 3, "III"},
+		{"test 4 return IV", 4, "IV"},
+		{"test 5 return V", 5, "V"},
+		{"6 gets converted to VI", 6, "VI"},
+		{"7 gets converted to VII", 7, "VII"},
+		{"8 gets converted to VIII", 8, "VIII"},
+		{"10 gets converted to X", 10, "X"},
+	}
 
-			if got != want {
-				t.Errorf("got %q, want %q", got, want)
-			}
-		})
+	for _, test := range tests {
+		got := ToRoman(test.arabic)
+		want := test.want
+
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
 	}
 }
 
-func TestArabicNumerals(t *testing.T) {
-	cases := []struct {
-		Description string
-		Want        int
-		Roman       string
-	}{
-		{"1 gets converted to I", 1, "I"},
-		{"2 gets converted to I", 2, "II"},
-		{"3 gets converted to I", 3, "III"},
-		{"4 gets converted to IV", 4, "IV"},
-		{"5 gets converted to V", 5, "V"},
-		{"8 gets converted to IX", 8, "VIII"},
-		{"9 gets converted to IX", 9, "IX"},
-		{"10 gets converted to X", 10, "X"},
-		{"14 gets converted to XIV", 14, "XIV"},
-		{"40 gets converted to XL", 40, "XL"},
+func TestToArabic(t *testing.T) {
+	type test struct {
+		description string
+		roman       string
+		want        int
 	}
 
-	for _, test := range cases {
-		t.Run(test.Description, func(t *testing.T) {
-			got := ConvertToArabic(test.Roman)
-			want := test.Want
+	tests := []test{
+		{"test 1 return I", "I", 1},
+		{"test 2 return II", "II", 2},
+		{"test 3 return III", "III", 3},
+		{"test 4 return IV", "IV", 4},
+		{"test 5 return V", "V", 5},
+		{"test 6 return VI", "VI", 6},
+		{"10 gets converted to X", "X", 10},
+	}
 
-			if got != want {
-				t.Errorf("got %q, want %q", got, want)
-			}
-		})
+	for _, test := range tests {
+		got := ToArabic(test.roman)
+		want := test.want
+
+		if got != want {
+			t.Errorf("got %d, want %d", got, want)
+		}
 	}
 }
