@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // PlayerStore stores score information about players
@@ -15,20 +14,46 @@ type PlayerStore interface {
 // PlayerServer is a HTTP interface
 type PlayerServer struct {
 	store PlayerStore
+	http.Handler
 }
 
-func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	player := strings.TrimPrefix(r.URL.Path, "/players/")
+// this is decorator pattern right?
+// it adds new functionality without changing the type
+func NewPlayerServer(store PlayerStore) *PlayerServer {
+	p := new(PlayerServer)
+
+	p.store = store
+
+	router := http.NewServeMux()
+	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+
+	// this replaces our own version of serveHTTP method
+	p.Handler = router
+
+	return p
+}
+
+// func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	p.router.ServeHTTP(w, r)
+// }
+
+func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
+func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
+	player := r.URL.Path[len("/players/"):]
 
 	switch r.Method {
 	case http.MethodPost:
 		p.processWin(w, player)
 	case http.MethodGet:
-		p.showScore(w, r, player)
+		p.showScore(w, player)
 	}
 }
 
-func (p *PlayerServer) showScore(w http.ResponseWriter, r *http.Request, player string) {
+func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
 	score := p.store.GetPlayerScore(player)
 
 	if score == 0 {
