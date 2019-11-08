@@ -19,11 +19,6 @@ type PlayerServer struct {
 	http.Handler
 }
 
-type Player struct {
-	Name string
-	Wins int
-}
-
 // this is decorator pattern right?
 // it adds new functionality without changing the type
 func NewPlayerServer(store PlayerStore) *PlayerServer {
