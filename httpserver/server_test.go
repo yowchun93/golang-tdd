@@ -133,12 +133,11 @@ func TestLeague(t *testing.T) {
 }
 
 func TestFileSystemStore(t *testing.T) {
-	t.Run("league from a reader", func(t *testing.T) {
+	t.Run("/league from a reader", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
             {"Name": "Cleo", "Wins": 10},
             {"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-
 		store := NewFileSystemPlayerStore(database)
 
 		got := store.GetLeague()
@@ -149,15 +148,9 @@ func TestFileSystemStore(t *testing.T) {
 		}
 
 		assertLeague(t, got, want)
-
-		// got = store.GetLeague()
-		// assertLeague(t, got, want)
 	})
 
 	t.Run("get player score", func(t *testing.T) {
-		// database := strings.NewReader(`[
-		//     {"Name": "Cleo", "Wins": 10},
-		// 		{"Name": "Chris", "Wins": 33}]`)
 		database, cleanDatabase := createTempFile(t, `[
             {"Name": "Cleo", "Wins": 10},
             {"Name": "Chris", "Wins": 33}]`)
@@ -176,14 +169,13 @@ func TestFileSystemStore(t *testing.T) {
 
 	t.Run("store wins for existing players", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
-        {"Name": "Cleo", "Wins": 10},
-        {"Name": "Chris", "Wins": 33}]`)
+            {"Name": "Cleo", "Wins": 10},
+            {"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
 		store := NewFileSystemPlayerStore(database)
 
 		store.RecordWin("Chris")
-
 		got := store.GetPlayerScore("Chris")
 		want := 34
 
@@ -195,7 +187,7 @@ func TestFileSystemStore(t *testing.T) {
 	t.Run("store wins for new players", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
         {"Name": "Cleo", "Wins": 10},
-				{"Name": "Chris", "Wins": 33}]`)
+        {"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
 		store := NewFileSystemPlayerStore(database)
@@ -210,7 +202,26 @@ func TestFileSystemStore(t *testing.T) {
 	})
 }
 
-func createTempFile(t *testing.T, initialData string) (io.ReadWriteSeeker, func()) {
+func TestTape_Write(t *testing.T) {
+	file, clean := createTempFile(t, "12345")
+	defer clean()
+
+	tape := &tape{file}
+
+	tape.Write([]byte("abc"))
+
+	file.Seek(0, 0)
+	newFileContents, _ := ioutil.ReadAll(file)
+
+	got := string(newFileContents)
+	want := "abc"
+
+	if got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+}
+
+func createTempFile(t *testing.T, initialData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpfile, err := ioutil.TempFile("", "db")
