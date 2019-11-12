@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"github.com/quii/learn-go-with-tests/command-line/v1"
+	"../../src"
 )
 
 const dbFileName = "game.db.json"
