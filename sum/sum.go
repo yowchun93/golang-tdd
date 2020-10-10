@@ -1,39 +1,38 @@
 package sum
 
-// Sum adds all the numbers together in the array
-func Sum(numbers []int) int {
-	sum := 0
-	// for i := 0; i < 5; i++ {
-	// 	sum += numbers[i]
-	// }
-	// return sum
+// Sum returns the sum of the array
+// func Sum(num [5]int) int {
+// 	sum := 0
+// 	for i := 0; i < 5; i++ {
+// 		sum += num[i]
+// 	}
 
-	// using range instead of for loop
-	for _, number := range numbers {
+// 	return sum
+// }
+
+// Sum uses range for iteration
+func Sum(num []int) int {
+	sum := 0
+	for _, number := range num {
 		sum += number
 	}
+
 	return sum
 }
 
+// SumAll sums each arrays
 func SumAll(numbersToSum ...[]int) []int {
-	var sums []int
-
-	for _, number := range numbersToSum {
-		sums = append(sums, Sum(number))
+	a := []int{}
+	for _, arr := range numbersToSum {
+		a = append(a, Sum(arr))
 	}
-	return sums
+	return a
 }
 
 func SumAllTails(numbersToSum ...[]int) []int {
-	var sums []int
-
-	for _, number := range numbersToSum {
-		if len(number) == 0 {
-			sums = append(sums, 0)
-		} else {
-			tail := number[1:]
-			sums = append(sums, Sum(tail))
-		}
+	a := []int{}
+	for _, arr := range numbersToSum {
+		a = append(a, Sum(arr[1:]))
 	}
-	return sums
+	return a
 }
