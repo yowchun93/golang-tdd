@@ -4,68 +4,56 @@ import "errors"
 
 type Dictionary map[string]string
 
-var (
-	ErrWordExists       = errors.New("cannot add word because it already exists")
-	ErrNotFound         = errors.New("searched word cannot be found")
-	ErrWordDoesNotExist = errors.New("cannot update word because it does not exist")
-)
+var ErrNotFound = errors.New("no such word")
+var WordExists = errors.New("word exists")
 
-type DictionaryErr string
-
-func (e DictionaryErr) Error() string {
-	return string(e)
-}
-
-func Search(dictionary map[string]string, word string) string {
-	return dictionary[word]
-}
-
-func (d Dictionary) Search(word string) (string, error) {
-	definition, ok := d[word]
-	if !ok {
-		return "", ErrNotFound
-	}
-	return definition, nil
-}
-
-// An interesting property of maps is that you can modify them without passing them as a pointer. This is because map is a reference type
-// my own definition
-// func (d Dictionary) Add(word, definition string) error {
-// 	if _, ok := d[word]; ok {
-// 		return ErrWordExists
-// 	}
-// 	d[word] = definition
-// 	return nil
+// func Search(dict map[string]string, word string) string {
+// 	return dict[word]
 // }
 
-// definition of Add from the tutorial
-// 1 thing i don't think about this is the Error driven development, but i guess Error is a type in GoLang
-func (d Dictionary) Add(word, definition string) error {
-	_, err := d.Search(word)
+func (d Dictionary) Search(key string) (string, error) {
+	definition, ok := d[key]
 
-	switch err {
-	case ErrNotFound:
-		d[word] = definition
-	case nil:
-		return ErrWordExists
-	default:
-		return err
+	if ok {
+		return definition, nil
 	}
+	return "", ErrNotFound
+}
 
+func (d Dictionary) Add(key string, word string) error {
+	_, error := d.Search(key)
+
+	switch error {
+	case ErrNotFound:
+		d[key] = word
+	case nil:
+		return WordExists
+	default:
+		return error
+	}
 	return nil
 }
 
-func (d Dictionary) Update(word, newDefinition string) error {
-	_, err := d.Search(word)
+func (d Dictionary) Update(key string, word string) error {
+	_, error := d.Search(key)
 
-	switch err {
-	case ErrNotFound:
-		return ErrWordDoesNotExist
+	switch error {
 	case nil:
-		d[word] = newDefinition
-	default:
-		return err
+		d[key] = word
+	case ErrNotFound:
+		return error
+	}
+	return nil
+}
+
+func (d Dictionary) Delete(key string) error {
+	_, error := d.Search(key)
+
+	switch error {
+	case ErrNotFound:
+		return error
 	}
 
+	delete(d, key)
 	return nil
 }
