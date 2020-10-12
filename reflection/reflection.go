@@ -2,54 +2,62 @@ package reflection
 
 import "reflect"
 
-//  Implementation 1
+type Person struct {
+	Name    string
+	Profile Profile
+}
+
+type Profile struct {
+	Age  int
+	City string
+}
+
 // func walk(x interface{}, fn func(input string)) {
-// 	val := reflect.ValueOf(x)
-// 	field := val.Field(0)
-// 	fn(field.String())
+// 	// call the anonymous function, passing in the argument
+// 	fn("Random words")
 // }
 
-// Implementation 2
 // func walk(x interface{}, fn func(input string)) {
 // 	val := reflect.ValueOf(x)
+
+// 	if val.Kind() == reflect.Slice {
+// 		for i := 0; i < val.Len(); i++ {
+// 			walk(val.Index(i).Interface(), fn)
+// 		}
+// 		return
+// 	}
 
 // 	for i := 0; i < val.NumField(); i++ {
 // 		field := val.Field(i)
 
-// 		if field.Kind() == reflect.String {
+// 		switch field.Kind() {
+// 		case reflect.String:
 // 			fn(field.String())
-// 		}
-
-// 		if field.Kind() == reflect.Struct {
+// 		case reflect.Struct:
 // 			walk(field.Interface(), fn)
 // 		}
 // 	}
 // }
 
-// Implementation 3
 func walk(x interface{}, fn func(input string)) {
-	val := reflect.ValueOf(x)
+	val := getValue(x)
 
-	// pointers needs to be handled a little differently
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-	}
-
-	if val.Kind() == reflect.Slice {
+	switch val.Kind() {
+	case reflect.Struct:
+		for i := 0; i < val.NumField(); i++ {
+			walk(val.Field(i).Interface(), fn)
+		}
+	case reflect.Slice:
 		for i := 0; i < val.Len(); i++ {
 			walk(val.Index(i).Interface(), fn)
 		}
-		return
+	case reflect.String:
+		fn(val.String())
 	}
+}
 
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
+func getValue(x interface{}) reflect.Value {
+	val := reflect.ValueOf(x)
 
-		switch field.Kind() {
-		case reflect.String:
-			fn(field.String())
-		case reflect.Struct:
-			walk(field.Interface(), fn)
-		}
-	}
+	return val
 }
